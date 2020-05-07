@@ -65,9 +65,7 @@
 	
 ## 线程池
 
-四种类型 && 参数意义
-工作队列 几种类型
-ExcuteService
+参见 线程池.md
 
 ## Kotlin 基础
 
@@ -105,5 +103,11 @@ SpraseArray
 自定义View
 
 ARouter 原理
+
+如何自学 Android 开发？ - 奶盖的回答 - 知乎
+https://www.zhihu.com/question/26417244/answer/1191786771
+
+HTTPS 证书
+https://www.jianshu.com/p/f5172daebd70
 
 

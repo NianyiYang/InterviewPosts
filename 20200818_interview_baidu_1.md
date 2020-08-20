@@ -104,13 +104,45 @@ GC 主要是指对 Java 堆内存做垃圾回收操作，而**方法区、栈和
 https://img-blog.csdn.net/20180330161852296
 
 ## 介绍一下多线程概念
+
+一个进程运行时产生了多个并发执行的线程
+
+死锁必要条件：互斥 不可剥夺 请求和保持 循环等待
+
+并发三要素
+**原子性：某些操作要么全部执行并且执行过程中不被打断，要么就全部不执行（表现得像一个整体）**
+**可见性：多个线程操作同一个共享变量时，其中一个线程修改了该变量，另外的线程能立即看到修改结果**
+**有序性：程序执行顺序按照代码的先后顺序来执行**
+
+解决原子性问题：使用原子函数`Atomic` / 加锁 `synchronized`
+解决可见性问题：使用 `volatile` 立即同步修改值到内存中 / 使用 `final` 修饰变量 / `synchronized` 也可保证可见性
+解决有序性问题：使用 `volatile` 防止重排序 / 使用 `synchronized` 串行执行同一代码块
+
 ## 单核CPU有没有必要多线程
-## 并发 互斥 的方式
+有必要。因为CPU执行速度远大于IO/网络请求等耗时操作的速度，单线程处理的话，每次耗时操作都会去等待返回结果，浪费了大量空闲时间；使用多线程就可以在等待耗时操作结果返回时切换线程去做别的操作，这样大大提高了效率
+## 并发 互斥 的方式 
+
+两种互斥锁：`synchronized` 和 `Lock` 对象
+
 ## synchronized 和 wait() notify() 区别
+
+`Obj.wait()` 与 `Obj.notify()` 必须要与`synchronized(Obj)`一起使用，也就是`wait()`,与`notify()`是针对已经获取了对象锁进行操作，从语法角度来说就是`Obj.wait()``Obj.notify`必须在`synchronized(Obj){ ... }` 的语句块内
+ 
 ## 管程有没有了解
 ## synchronized 底层原理
-## volitile关键字解决的问题
+
+`synchronized` 是 JVM实现的一种互斥同步访问的方式，被 `synchronized` 修饰的代码片段编译后在代码前后加入了一组字节指令 `monitorEnter``monitorExit`通过这两个指令控制代码的互斥访问
+
+> `Monitor`使用的是类似计数器的形式，计数器为0时锁即释放
+
+## volatile关键字解决的问题
+
+可见性/有序性
+
 ## 可见性问题产生的原因
+
+多线程环境下，**一个线程对某个共享变量进行更新之后，后续访问该变量的线程可能无法立刻读取到这个更新的结果，甚至永远也无法读取到这个更新的结果**
+
 ## 并发修改修改同一处变量会产生问题吗
 
 ## Handler实现原理
@@ -121,8 +153,38 @@ https://img-blog.csdn.net/20180330161852296
 
 ## 常用开源库的源码
 ## Glide缓存如何实现的 与picasso fresco的区别
-## okhttp实际的网络请求是如何发起
+## Okhttp 原理？实际的网络请求是如何发起
+
+提供的特性：
+- 网络重定向 `RetryAndFollowInterceptor`
+- 网络缓存 `CacheInterceptor`
+- Http 2.0 keepalive 连接池复用
+- 支持 Web Socket
+
+`Okhttp` 通过 `OkhttpClient` 构建网络请求客户端来维护实际上的请求
+发起请求时，实际上是通过`OkhttpClient.newCall()` 创立一个 `RealCall` 对象
+`OkHttpClient` 构建时，绑定了一个 `Dispatcher` 对象，通过这个对象执行同步 `execute` 或者异步 `enqueue` 请求；而这两个方法中实际上是调用 `getResponseWithInterceptorChain()` 方法，从拦截器链中获取依次通过各种拦截器拦截后返回的结果——一个符合HTTP协议的Response对象
+
+## Retrofit 原理 支持哪些特性
+
+使用建造者模式配置参数生成 `Retrofit` 实例； 在 `Retrofit.create()` 方法中**通过JDK动态代理生成 `Service` 对应的实例**
+
+```java
+// 动态代理模式
+return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class<?>[] { service }, new InvocationHandler() {
+
+          @Override public @Nullable Object invoke(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
+            ... ...
+        });
+```
+
+在调用接口方法时，会触发 `InvocationHandler.invoke()` 将 接口方法转为 `ServiceMethod`  类持有的对象；使用这个类中的方法解析接口的注解参数和请求参数（根据CallAdapter），生成 OkHttp 请求；最后将返回结果通过 ConvertAdapter 解析成相应的返回体
 
 ## 设计模式 代理 装饰 适配器 策略 的区别
+
+代理模式：隔离调用类与被调用类，使用代理类去协调
+适配器模式：将某个类通过适配类转换成需要的类
+装饰模式：通过在原有类的基础之上增加某些新的功能变成另一个类
+策略模式：
 
 ## kotlin 协程 为什么转协程

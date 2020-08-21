@@ -127,7 +127,7 @@ https://img-blog.csdn.net/20180330161852296
 ## synchronized 和 wait() notify() 区别
 
 `Obj.wait()` 与 `Obj.notify()` 必须要与`synchronized(Obj)`一起使用，也就是`wait()`,与`notify()`是针对已经获取了对象锁进行操作，从语法角度来说就是`Obj.wait()``Obj.notify`必须在`synchronized(Obj){ ... }` 的语句块内
- 
+
 ## 管程有没有了解
 ## synchronized 底层原理
 
@@ -147,12 +147,22 @@ https://img-blog.csdn.net/20180330161852296
 
 ## Handler实现原理
 ## 子线程能用Handler吗
-## 消息是如何放到消息队列中的然后怎么从looper中取出来
+## 消息是如何放到消息队列中的，然后怎么从looper中取出来
+
+在初始化 Handler 时，调用 `Looper.myLooper()`方法获取当前线程对应的 Looper；而 Looper 内部持有一个 `MessageQueue` 对象，初始化 Handler 时即将这个 `MessageQueue` 传递给 Handler 持有。这样消息队列就与 Handler 和 Looper 连接了起来
+
 ## ThreadLocal了解
 ## 跨进程通信 BindService 方法中做了哪些操作
 
 ## 常用开源库的源码
-## Glide缓存如何实现的 与picasso fresco的区别
+## Glide缓存如何实现的 与Picasso Fresco的区别
+
+Glide：可以加载GIF；二级缓存策略
+
+Fresco：可以加载GIF；缓存在 Native 层处理；特有的图片容器 `SimpleDraweeView`
+
+Picasso：不可加载GIF；内存开销大
+
 ## Okhttp 原理？实际的网络请求是如何发起
 
 提供的特性：
